@@ -1,14 +1,38 @@
-use crate::types::Instruction;
+use crate::types::{AInstruction, CInstruction, Instruction};
 
-pub fn parse(mut instruction: String) -> Instruction {
-    if instruction.chars().nth(0).unwrap() == '@' {
-        instruction.remove(0);
-        return Instruction::AInstruction { decimal: instruction };
+pub fn parse(instruction: &String) -> Option<Instruction> {
+    let mut cloned = instruction.clone();
+
+    if cloned.chars().nth(0).unwrap() == '@' {
+        cloned.remove(0);
+
+        return Some(Instruction::AInstruction(AInstruction {
+            decimal: cloned.to_string(),
+        }));
     }
 
-    Instruction::CInstruction {
-        dest: "1".to_owned(),
-        comp: "2".to_owned(),
-        jump: "3".to_owned(),
+    let slice: Vec<&str> = cloned.split("=").collect();
+
+    match slice.as_slice() {
+        [dest, comp_and_jump] => match comp_and_jump.find(";") {
+            Some(with_jump) => {
+                let second_slice: Vec<&str> = comp_and_jump.split(";").collect();
+
+                match second_slice.as_slice() {
+                    [comp, jump] => Some(Instruction::CInstruction(CInstruction {
+                        dest: dest.to_string(),
+                        comp: comp.to_string(),
+                        jump: Some(jump.to_string()),
+                    })),
+                    _ => None,
+                }
+            }
+            None => Some(Instruction::CInstruction(CInstruction {
+                dest: dest.to_string(),
+                comp: comp_and_jump.to_string(),
+                jump: None,
+            })),
+        },
+        _ => None,
     }
 }

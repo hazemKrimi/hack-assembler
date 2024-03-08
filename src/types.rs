@@ -1,10 +1,14 @@
+pub struct AInstruction {
+    pub decimal: String,
+}
+
+pub struct CInstruction {
+    pub dest: String,
+    pub comp: String,
+    pub jump: Option<String>,
+}
+
 pub enum Instruction {
-    AInstruction {
-        decimal: String
-    },
-    CInstruction {
-        dest: String,
-        comp: String,
-        jump: String
-    }
+    AInstruction(AInstruction),
+    CInstruction(CInstruction),
 }

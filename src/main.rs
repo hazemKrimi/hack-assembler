@@ -8,22 +8,34 @@ use std::process;
 use regex::Regex;
 use types::Instruction;
 
-mod parser;
 mod types;
+mod parser;
+mod code;
 
 fn process(instruction: String) -> String {
-    // let parsed = parser::parse(instruction);
+    match parser::parse(&instruction) {
+        Some(parsed) => match parsed {
+            Instruction::AInstruction(parsed_instruction) => {
+                let translated = code::decimal_to_binary(&parsed_instruction.decimal.parse::<i32>().unwrap());
 
-    // match parsed {
-    //     Instruction::AInstruction { .. } => {
-    //         let a_instruction: Instruction::AInstruction = parsed;
+                String::from(format!("0{}", translated))
+            }
+            Instruction::CInstruction(parsed_instruction) => {
+                println!(
+                    "C: {}, {}, {}",
+                    parsed_instruction.dest,
+                    parsed_instruction.comp,
+                    parsed_instruction.jump.unwrap_or_else(|| "".to_string())
+                );
 
-    //         println!("{}", a_instruction.decimal)
-    //     },
-    //     _ => ()
-    // }
-
-    instruction
+                instruction
+            }
+        },
+        None => {
+            println!("Unexpected error!");
+            process::exit(1)
+        }
+    }
 }
 
 fn main() {
@@ -43,7 +55,7 @@ fn main() {
             let mut file = fs::File::create(format!("{}.hack", filename)).unwrap();
             let content = fs::read_to_string(&path).expect("You must provide a correct filepath!");
             let re = Regex::new(r"\s*\/\/.*").unwrap();
-            let without_whitespace: String = content
+            let processed: String = content
                 .lines()
                 .filter(|line| !line.starts_with("//") && !line.is_empty())
                 .map(|line| re.replace_all(line, ""))
@@ -51,7 +63,7 @@ fn main() {
                 .map(|line| format!("{}\n", line))
                 .collect();
 
-            file.write_all(without_whitespace.as_bytes()).unwrap();
+            file.write_all(processed.as_bytes()).unwrap();
         }
         _ => {
             println!("The file extension must be asm!");
