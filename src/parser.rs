@@ -15,7 +15,7 @@ pub fn parse(instruction: &String) -> Option<Instruction> {
 
     match slice.as_slice() {
         [dest, comp_and_jump] => match comp_and_jump.find(";") {
-            Some(with_jump) => {
+            Some(_) => {
                 let second_slice: Vec<&str> = comp_and_jump.split(";").collect();
 
                 match second_slice.as_slice() {

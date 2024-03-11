@@ -8,33 +8,31 @@ use std::process;
 use regex::Regex;
 use types::Instruction;
 
-mod types;
-mod parser;
 mod code;
+mod parser;
+mod types;
 
 fn process(instruction: String) -> String {
     match parser::parse(&instruction) {
         Some(parsed) => match parsed {
             Instruction::AInstruction(parsed_instruction) => {
-                let translated = code::decimal_to_binary(&parsed_instruction.decimal.parse::<i32>().unwrap());
+                let translated = code::decimal_to_fifteen_bits_binary(
+                    &parsed_instruction.decimal.parse::<i32>().unwrap(),
+                );
 
                 String::from(format!("0{}", translated))
             }
             Instruction::CInstruction(parsed_instruction) => {
-                println!(
-                    "C: {}, {}, {}",
-                    parsed_instruction.dest,
-                    parsed_instruction.comp,
-                    parsed_instruction.jump.unwrap_or_else(|| "".to_string())
-                );
-
-                instruction
+                String::from("111")
+                    + code::translate_comp(&parsed_instruction.comp).as_str()
+                    + code::translate_dest(&parsed_instruction.dest).as_str()
+                    + code::translate_jump(
+                        &parsed_instruction.jump.unwrap_or_else(|| "".to_string()),
+                    )
+                    .as_str()
             }
         },
-        None => {
-            println!("Unexpected error!");
-            process::exit(1)
-        }
+        None => panic!("Unexpected error!"),
     }
 }
 
