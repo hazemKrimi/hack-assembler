@@ -3,8 +3,8 @@ pub struct AInstruction {
 }
 
 pub struct CInstruction {
-    pub dest: String,
-    pub comp: String,
+    pub dest: Option<String>,
+    pub comp: Option<String>,
     pub jump: Option<String>,
 }
 

@@ -14,25 +14,25 @@ mod types;
 
 fn process(instruction: String) -> String {
     match parser::parse(&instruction) {
-        Some(parsed) => match parsed {
-            Instruction::AInstruction(parsed_instruction) => {
-                let translated = code::decimal_to_fifteen_bits_binary(
-                    &parsed_instruction.decimal.parse::<i32>().unwrap(),
-                );
+        Instruction::AInstruction(parsed_instruction) => {
+            match parsed_instruction.decimal.parse::<i32>() {
+                Ok(decimal) => {
+                    let translated = code::decimal_to_fifteen_bits_binary(&decimal);
 
-                String::from(format!("0{}", translated))
+                    String::from(format!("0{}", translated))
+                }
+                Err(_) => panic!("Failed to parse A instruction {}", instruction),
             }
-            Instruction::CInstruction(parsed_instruction) => {
-                String::from("111")
-                    + code::translate_comp(&parsed_instruction.comp).as_str()
-                    + code::translate_dest(&parsed_instruction.dest).as_str()
-                    + code::translate_jump(
-                        &parsed_instruction.jump.unwrap_or_else(|| "".to_string()),
-                    )
+        }
+        Instruction::CInstruction(parsed_instruction) => {
+            String::from("111")
+                + code::translate_comp(&parsed_instruction.comp.unwrap_or_else(|| "".to_string()))
                     .as_str()
-            }
-        },
-        None => panic!("Unexpected error!"),
+                + code::translate_dest(&parsed_instruction.dest.unwrap_or_else(|| "".to_string()))
+                    .as_str()
+                + code::translate_jump(&parsed_instruction.jump.unwrap_or_else(|| "".to_string()))
+                    .as_str()
+        }
     }
 }
 

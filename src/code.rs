@@ -66,7 +66,7 @@ pub fn translate_comp(comp: &String) -> String {
         "M-D" => "1000111",
         "D&M" => "1000000",
         "D|M" => "1010101",
-        _ => panic!("Unexpected error converting the code!"),
+        _ => "0000000",
     }
     .to_string()
 }
