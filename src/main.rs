@@ -49,8 +49,8 @@ fn main() {
         .unwrap_or("")
     {
         "asm" => {
-            let filename = path.file_stem().unwrap().to_str().unwrap();
-            let mut file = fs::File::create(format!("{}.hack", filename)).unwrap();
+            let filepath = path.canonicalize().unwrap().to_str().unwrap().replace("asm", "hack");
+            let mut file = fs::File::create(filepath).unwrap();
             let content = fs::read_to_string(&path).expect("You must provide a correct filepath!");
             let re = Regex::new(r"\s*\/\/.*").unwrap();
             let processed: String = content
