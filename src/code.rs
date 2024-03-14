@@ -5,7 +5,7 @@ pub fn decimal_to_fifteen_bits_binary(decimal: &i32) -> String {
 pub fn translate_dest(dest: &String) -> String {
     let cloned = dest.clone();
 
-    match cloned.as_str() {
+    match cloned.as_str().trim() {
         "M" => "001",
         "D" => "010",
         "MD" => "011",
@@ -21,7 +21,7 @@ pub fn translate_dest(dest: &String) -> String {
 pub fn translate_jump(jump: &String) -> String {
     let cloned = jump.clone();
 
-    match cloned.as_str() {
+    match cloned.as_str().trim() {
         "JGT" => "001",
         "JEQ" => "010",
         "JGE" => "011",
@@ -37,7 +37,7 @@ pub fn translate_jump(jump: &String) -> String {
 pub fn translate_comp(comp: &String) -> String {
     let cloned = comp.clone();
 
-    match cloned.as_str() {
+    match cloned.as_str().trim() {
         "0" => "0101010",
         "1" => "0111111",
         "-1" => "0111010",
