@@ -4,7 +4,7 @@ use regex::Regex;
 pub fn parse(instruction: &String) -> Instruction {
     let mut cloned = instruction.clone();
 
-    if cloned.chars().nth(0).unwrap() == '@' {
+    if cloned.starts_with('@') {
         cloned.remove(0);
 
         return Instruction::AInstruction(AInstruction {
