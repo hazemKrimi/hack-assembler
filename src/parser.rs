@@ -1,15 +1,42 @@
-use crate::types::{AInstruction, CInstruction, Instruction};
+use std::collections::HashMap;
+
+use crate::types::{AInstruction, Address, CInstruction, Instruction};
 use regex::Regex;
 
-pub fn parse(instruction: &String) -> Instruction {
+pub fn parse(instruction: &String, table: &mut HashMap<String, (i32, Address)>) -> Instruction {
     let mut cloned = instruction.clone();
 
     if cloned.starts_with('@') {
         cloned.remove(0);
 
-        return Instruction::AInstruction(AInstruction {
-            decimal: cloned.trim().to_string(),
-        });
+        if cloned.parse::<i32>().is_ok() {
+            return Instruction::AInstruction(AInstruction { decimal: cloned });
+        } else {
+            if table.contains_key(&cloned) {
+                return Instruction::AInstruction(AInstruction {
+                    decimal: table.get(&cloned).copied().unwrap().0.to_string(),
+                });
+            } else {
+                let mut temp_table = table.clone();
+
+                temp_table.remove_entry(&String::from("SCREEN"));
+                temp_table.remove_entry(&String::from("KBD"));
+
+                let address = temp_table
+                    .iter()
+                    .filter(|(_, (_, address))| matches!(address, Address::RAM))
+                    .fold(
+                        0,
+                        |acc, (_, (addr, _))| if *addr > acc { *addr } else { acc },
+                    )
+                    + 1;
+
+                table.insert(cloned, (address, Address::RAM));
+                return Instruction::AInstruction(AInstruction {
+                    decimal: address.to_string(),
+                });
+            }
+        }
     } else {
         let re_dest = Regex::new(r"=").unwrap();
         let re_jump = Regex::new(r";").unwrap();

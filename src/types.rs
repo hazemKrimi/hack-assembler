@@ -8,6 +8,12 @@ pub struct CInstruction {
     pub jump: Option<String>,
 }
 
+ #[derive(Clone, Copy)]
+pub enum Address {
+    RAM,
+    ROM
+}
+
 pub enum Instruction {
     AInstruction(AInstruction),
     CInstruction(CInstruction),
